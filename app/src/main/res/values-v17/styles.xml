@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <style name="BtnNanodegree">
+                <item name="android:layout_marginTop">10dp</item>
+                <item name="android:layout_alignLeft">@id/textView</item>
+                <item name="android:layout_alignStart">@id/textView</item>
+                <item name="android:layout_alignEnd">@id/textView</item>
+                <item name="android:layout_alignRight">@id/textView</item>
+                <item name="android:background">@color/colorNanoDegree</item>
+        </style>
+</resources>
