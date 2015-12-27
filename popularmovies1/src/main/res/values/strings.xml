@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Popular Movies 1</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Movies list texts -->
+    <string name="offline_message">Without Internet Connection</string>
+    <string name="loading_message">Loading...</string>
+
+    <string name="pref_sort_key">pref_sort</string>
+    <!--<string name="pref_sort_label">Sort Movies by</string>-->
+    <string name="pref_sort_value_popularity">popularity.desc</string>
+    <string name="pref_sort_value_rate">vote_average.desc</string>
+    <!--<string name="pref_sort_label_popularity">Popularity</string>-->
+    <!--<string name="pref_sort_label_rate">Highest-Rated</string>-->
+
+    <string name="action_popular">Most Popular</string>
+    <string name="action_high_rate">Highest Rated</string>
+
+    <!-- Movie Detail texts -->
+    <string name="movie_detail_overview_title">Overview</string>
+    <string name="movie_detail_release_date">Release Date</string>
+    <string name="movie_detail_rating">Rating</string>
+</resources>
