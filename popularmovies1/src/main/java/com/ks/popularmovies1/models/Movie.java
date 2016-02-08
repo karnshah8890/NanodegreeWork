@@ -25,6 +25,7 @@ public class Movie implements Parcelable{
     private String voteAverage;
     @SerializedName("release_date")
     private String releaseDate;
+    private float popularity;
 
     public int getId() {
         return id;
@@ -82,6 +83,33 @@ public class Movie implements Parcelable{
         this.releaseDate = releaseDate;
     }
 
+    public float getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(float popularity) {
+        this.popularity = popularity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o == null)
+            return false;
+
+        if (!(o instanceof Movie))
+            return false;
+
+        Movie m = (Movie) o;
+        long movieId = m.getId();
+
+        if (movieId == 0)
+            return false;
+
+        return id == m.getId();
+
+    }
+
     protected Movie(Parcel in) {
         id = in.readInt();
         posterPath = in.readString();
@@ -90,6 +118,7 @@ public class Movie implements Parcelable{
         overview = in.readString();
         voteAverage = in.readString();
         releaseDate = in.readString();
+        popularity = in.readFloat();
     }
 
     @Override
@@ -106,6 +135,7 @@ public class Movie implements Parcelable{
         dest.writeString(overview);
         dest.writeString(voteAverage);
         dest.writeString(releaseDate);
+        dest.writeFloat(popularity);
     }
 
     @SuppressWarnings("unused")

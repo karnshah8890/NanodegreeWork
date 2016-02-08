@@ -1,46 +1,59 @@
 package com.ks.popularmovies1.fragments;
 
 import android.app.Fragment;
-import android.app.ProgressDialog;
-import android.content.Intent;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.LinearLayout;
 
 import com.ks.popularmovies1.R;
-import com.ks.popularmovies1.activities.MovieDetailActivity;
 import com.ks.popularmovies1.adapters.MoviesAdapter;
-import com.ks.popularmovies1.models.DiscoverResult;
-import com.ks.popularmovies1.models.Movie;
+import com.ks.popularmovies1.data.MovieContract;
 import com.ks.popularmovies1.utils.Utils;
-import com.ks.popularmovies1.webservices.WebService;
-
-import java.util.ArrayList;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  * Created by karn.shah on 26-12-2015.
  */
-public class MovieListFragment extends Fragment {
+public class MovieListFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener,LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String GRID_SCROLL_KEY = "GRID_INDEX";
 
-    private String sortValue = null;
-    private int gridScrollValue = 0;
+//    private String sortValue = null;
+//    private int gridScrollValue = 0;
 
     private MoviesAdapter mAdapter;
     private GridView mGVMovies;
 
-    private ProgressDialog mPDLoading;
-    private LinearLayout mLLOffline;
+//    private ProgressDialog mPDLoading;
+//    private LinearLayout mLLOffline;
+
+    private static final String SELECTED_KEY = "SELECTED_POSITION";
+
+    private int mPosition = GridView.INVALID_POSITION;
+    private static final int MOVIES_LOADER = 0;
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailMovieCallback for when an item has been selected.
+         */
+        void onGridItemSelected(Uri detailUri, View sharedView);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,13 +61,13 @@ public class MovieListFragment extends Fragment {
 
 
 
-        if (sortValue == null) {
-            // get the sort value from shared preferences
-            sortValue =getArguments().getString(getString(R.string.pref_sort_key));
-        }
+//        if (sortValue == null) {
+//            // get the sort value from shared preferences
+//            sortValue =getArguments().getString(getString(R.string.pref_sort_key));
+//        }
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(GRID_SCROLL_KEY))
-            gridScrollValue = savedInstanceState.getInt(GRID_SCROLL_KEY);
+//        if (savedInstanceState != null && savedInstanceState.containsKey(GRID_SCROLL_KEY))
+//            gridScrollValue = savedInstanceState.getInt(GRID_SCROLL_KEY);
     }
 
     @Nullable
@@ -67,71 +80,7 @@ public class MovieListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initCompo();
-        if (Utils.isNetworkConnected(getActivity())) {
-            loadMovies();
-        }else{
-            if (mLLOffline != null)
-                mLLOffline.setVisibility(View.VISIBLE);
-
-            if (mGVMovies != null)
-                mGVMovies.setVisibility(View.GONE);
-
-            // hide the loading ProgressDialog
-            if (mPDLoading!=null && mPDLoading.isShowing())
-                mPDLoading.dismiss();
-        }
-
-    }
-
-    private void loadMovies() {
-        if (mPDLoading == null)
-            mPDLoading = new ProgressDialog(getActivity(), ProgressDialog.STYLE_SPINNER);
-
-        mPDLoading.setIndeterminate(true);
-        mPDLoading.setMessage(getString(R.string.loading_message));
-        mPDLoading.show();
-        WebService.setAdapter().discover(sortValue, new Callback<DiscoverResult>() {
-            @Override
-            public void success(DiscoverResult discoverResult, Response response) {
-                if (mGVMovies != null && mGVMovies.getVisibility() == View.GONE)
-                    mGVMovies.setVisibility(View.VISIBLE);
-
-                if (mLLOffline != null && mLLOffline.getVisibility() == View.VISIBLE)
-                    mLLOffline.setVisibility(View.GONE);
-
-                // cleaning the MovieAdapter
-                mAdapter.clear();
-
-                if (discoverResult != null && discoverResult.results != null && !discoverResult.results.isEmpty()) {
-                    // we use the addAll method to avoid the consecutive notifyDataSetChanged invoke
-                    mAdapter.addAll(discoverResult.results);
-
-                    // scrolling to last scroll saved status
-                    mGVMovies.setSelection(gridScrollValue);
-                }
-
-                // hide the loading ProgressDialog
-                if (mPDLoading!=null && mPDLoading.isShowing())
-                    mPDLoading.dismiss();
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                // show an error API request
-                if (mPDLoading!=null && mPDLoading.isShowing())
-                    mPDLoading.dismiss();
-//                Toast.makeText(getActivity(), "HTTP API ERROR", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void initCompo() {
-// getting an instance of offline message...
-        mLLOffline = (LinearLayout) getView().findViewById(R.id.llOffline);
-
-        // creating a MovieAdapter using movie_poster layout for each movie result
-        mAdapter = new MoviesAdapter(getActivity(), R.layout.row_grid_movies, new ArrayList<Movie>());
+        mAdapter = new MoviesAdapter(getActivity(), null, 0);
 
         mGVMovies = (GridView) getView().findViewById(R.id.gvMovies);
         // set the MoviesAdapter to GridView
@@ -139,19 +88,95 @@ public class MovieListFragment extends Fragment {
 
         mGVMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // start detail activity using existent Movie data
-                Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-                intent.putExtra(Utils.MOVIE_DETAIL_KEY, mAdapter.getItem(position));
-                startActivity(intent);
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+
+                mPosition = position;
+
+                if (cursor != null) {
+
+                    ((Callback) getActivity())
+                            .onGridItemSelected(
+                                    MovieContract.MovieEntry.buildMovieUri(cursor.getLong(Utils.MovieColumnsIndex.COL_MOVIE_ID)),
+                                    view.findViewById(R.id.iv_movie_poster)
+                            );
+                }
+
             }
         });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The gridview probably hasn't even been populated yet.  Actually perform the
+            // swapout in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
+
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        // saving scroll position
-        outState.putInt(GRID_SCROLL_KEY, mGVMovies.getFirstVisiblePosition());
+        // saving selected position
+        if (mPosition != GridView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String filterBy = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_value_popularity));
+
+        Uri filterMoviesUri = MovieContract.MovieEntry.buildMoviesUri(filterBy);
+
+        return new CursorLoader(getActivity(),
+                filterMoviesUri,
+                Utils.MOVIES_COLUMNS,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.e(MovieListFragment.class.getSimpleName(), " cursor data count : " + data.getCount());
+        mAdapter.swapCursor(data);
+
+        if (mPosition != GridView.INVALID_POSITION) {
+            mGVMovies.smoothScrollToPosition(mPosition);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        PreferenceManager.getDefaultSharedPreferences(getActivity()).unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (getString(R.string.pref_sort_key).equals(key)) {
+            mPosition = 0;
+            getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
+        }
     }
 }

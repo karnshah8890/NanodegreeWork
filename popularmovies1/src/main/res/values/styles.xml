@@ -21,4 +21,15 @@
         <item name="android:background">@color/pm_grid_title_background</item>
         <item name="android:padding">4dp</item>
     </style>
+
+    <style name="PopularMovieSubtitle" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/pm_subtitles</item>
+        <item name="android:layout_marginBottom">5dp</item>
+    </style>
+
+    <style name="PopularMovieCollapsedAppBar" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/pm_subtitles</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>

@@ -5,6 +5,6 @@ import java.util.List;
 /**
  * Created by karn.shah on 26-12-2015.
  */
-public class DiscoverResult {
-    public List<Movie> results;
+public class DiscoverResult<T> {
+    public List<T> results;
 }

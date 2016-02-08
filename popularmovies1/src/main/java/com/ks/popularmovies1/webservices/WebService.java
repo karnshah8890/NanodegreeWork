@@ -2,6 +2,8 @@ package com.ks.popularmovies1.webservices;
 
 import com.ks.popularmovies1.models.DiscoverResult;
 import com.ks.popularmovies1.models.Movie;
+import com.ks.popularmovies1.models.Review;
+import com.ks.popularmovies1.models.TrailerResult;
 import com.ks.popularmovies1.utils.Utils;
 
 import retrofit.Callback;
@@ -47,7 +49,7 @@ public class WebService {
          * @param sortBy R.string.pref_sort_value_popularity or R.string.pref_sort_value_rate
          */
         @GET("/discover/movie")
-        void discover(@Query("sort_by") String sortBy, Callback<DiscoverResult> cb);
+        void discover(@Query("sort_by") String sortBy, Callback<DiscoverResult<Movie>> cb);
 
         /**
          * Get Movie Detail from TMDb API using a Http Request
@@ -56,5 +58,20 @@ public class WebService {
         @GET("/movie/{id}")
         void movieDetail(@Path("id") int movieId, Callback<Movie> cb);
 
+       /**
+        * Get videos (trailers) by movie id
+        * @param movieId
+        * @param callback
+        */
+       @GET("/movie/{id}/trailers")
+       void movieTrailers(@Path("id") long movieId, Callback<TrailerResult> callback);
+
+       /**
+        * Get reviews by movie id
+        * @param movieId
+        * @param callback
+        */
+       @GET("/movie/{id}/reviews")
+       void movieReviews(@Path("id") long movieId, Callback<DiscoverResult<Review>> callback);
     }
 }

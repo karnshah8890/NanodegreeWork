@@ -11,6 +11,7 @@
     <com.inthecheesefactory.thecheeselibrary.widget.AdjustableImageView
         android:id="@+id/iv_movie_poster"
         android:layout_width="match_parent"
+        android:transitionName="@string/poster_share_element"
         android:layout_height="match_parent"
         android:scaleType="fitStart"
         android:adjustViewBounds="true"

@@ -10,14 +10,23 @@
     <!--<string name="pref_sort_label">Sort Movies by</string>-->
     <string name="pref_sort_value_popularity">popularity.desc</string>
     <string name="pref_sort_value_rate">vote_average.desc</string>
+    <string name="pref_sort_value_fav">favorite</string>
     <!--<string name="pref_sort_label_popularity">Popularity</string>-->
     <!--<string name="pref_sort_label_rate">Highest-Rated</string>-->
 
     <string name="action_popular">Most Popular</string>
     <string name="action_high_rate">Highest Rated</string>
+    <string name="action_fav">Favorites</string>
 
     <!-- Movie Detail texts -->
     <string name="movie_detail_overview_title">Overview</string>
     <string name="movie_detail_release_date">Release Date</string>
     <string name="movie_detail_rating">Rating</string>
+    <string name="poster_share_element">poster_share_element</string>
+    <string name="movie_detail_trailers_title">Trailers</string>
+    <string name="movie_detail_reviews_title">Reviews</string>
+    <string name="action_share">Share Movie</string>
+
+    <string name="sync_account_type">popularmovies.ks.com</string>
+    <string name="content_authority">com.ks.popularmovies</string>
 </resources>
